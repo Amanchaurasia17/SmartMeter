@@ -1,3 +1,3 @@
 # SmartMeter
 
-check website: https://sb1-bywfio1b.stackblitz.io
+check website: https://resilient-cheesecake-1fb75d.netlify.app/
