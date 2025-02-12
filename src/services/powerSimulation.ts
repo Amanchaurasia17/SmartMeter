@@ -23,7 +23,7 @@ class PowerSimulationService {
     this.simulationInterval = setInterval(() => {
       const data = this.generatePowerData();
       this.powerSubject.next(data);
-    }, 3000); // 10 seconds
+    }, 1000); // 10 seconds
 
     // Generate initial data immediately
     const initialData = this.generatePowerData();
