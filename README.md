@@ -3,7 +3,7 @@ The Digital Meter Dashboard is a web application built using the MERN stack to m
 
 
 
-#Core Functionalities:
+###Core Functionalities:
 Energy Dashboard: Displays energy consumption statistics (total, average, and cost) with real-time updates.
 Data Visualization: Interactive line charts showing energy consumption trends (Day, Month, Year views).
 Device Management: Add and manage energy-monitoring devices via the Add Device page.
