@@ -8,7 +8,8 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 } from 'chart.js';
 import { usePowerData } from '../hooks/usePowerData';
 import { formatCurrency, calculateCost } from '../utils/currency';
@@ -21,29 +22,54 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const Dashboard = () => {
   const { currentUsage, history, components } = usePowerData();
 
   const powerData = {
-    labels: history.map(h => new Date(h.timestamp).toLocaleTimeString()),
+    labels: history.map(h => {
+      const date = new Date(h.timestamp);
+      return date.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true 
+      });
+    }),
     datasets: [{
-      label: 'Power Usage (kWh)',
+      label: 'Power Usage',
       data: history.map(h => h.totalUsage),
       borderColor: 'rgb(59, 130, 246)',
       backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      fill: true
+      fill: true,
+      tension: 0.4,
+      pointRadius: 2,
+      pointHoverRadius: 4,
+      pointBackgroundColor: 'rgb(59, 130, 246)',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1
     }]
   };
 
-  const dailyAverage = history.length > 0 
+  // Calculate actual energy consumption more accurately
+  // History contains instantaneous power readings (kW), not kWh
+  // Current readings show power consumption rate per hour
+  
+  // Daily average: average of all power readings (this is average power in kW)
+  const averagePower = history.length > 0 
     ? history.reduce((acc, curr) => acc + curr.totalUsage, 0) / history.length
     : 0;
 
-  const HOURS_IN_MONTH = 24 * 30;
-  const monthlyProjection = calculateCost(dailyAverage * HOURS_IN_MONTH);
+  // Realistic daily consumption: average power × 24 hours = kWh per day
+  const dailyConsumption = averagePower * 24;
+
+  // Monthly projection based on daily consumption
+  const DAYS_IN_MONTH = 30;
+  const monthlyConsumption = dailyConsumption * DAYS_IN_MONTH;
+  const monthlyProjection = calculateCost(monthlyConsumption);
 
   const topConsumers = components
     .filter(comp => comp.isOn)
@@ -57,13 +83,13 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Current Usage</h3>
-          <p className="text-3xl font-bold text-blue-600">{currentUsage.toFixed(1)} kWh</p>
+          <p className="text-3xl font-bold text-blue-600">{currentUsage.toFixed(2)} kW</p>
           <p className="text-sm text-gray-500">Cost: {formatCurrency(calculateCost(currentUsage))}/hr</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">Daily Average</h3>
-          <p className="text-3xl font-bold text-green-600">{dailyAverage.toFixed(1)} kWh</p>
-          <p className="text-sm text-gray-500">Cost: {formatCurrency(calculateCost(dailyAverage))}/day</p>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Estimated Daily</h3>
+          <p className="text-3xl font-bold text-green-600">{dailyConsumption.toFixed(1)} kWh</p>
+          <p className="text-sm text-gray-500">Cost: {formatCurrency(calculateCost(dailyConsumption))}/day</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Monthly Projection</h3>
@@ -109,7 +135,7 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-700 mb-4">Recent Alerts</h3>
           <div className="space-y-4">
-            {currentUsage > 6 && (
+            {currentUsage > 3.5 && (
               <div className="p-4 rounded-lg bg-yellow-50 border-l-4 border-yellow-400">
                 <div className="flex justify-between">
                   <span className="font-medium">High Power Usage</span>
@@ -121,7 +147,7 @@ const Dashboard = () => {
               </div>
             )}
             {components
-              .filter(comp => comp.isOn && comp.currentUsage > 2)
+              .filter(comp => comp.isOn && comp.currentUsage > 1.5)
               .map(comp => (
                 <div 
                   key={comp.id} 

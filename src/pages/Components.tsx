@@ -15,6 +15,10 @@ const Components = () => {
     }
   };
 
+  const handleSetTimer = (id: string, minutes: number) => {
+    componentStore.setAutoOffTimer(id, minutes);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -30,19 +34,13 @@ const Components = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {components.map((component) => (
-          <div key={component.id} className="relative">
-            <PowerComponent
-              component={component}
-              onToggle={toggleComponent}
-            />
-            <button
-              onClick={() => handleDelete(component.id)}
-              className="absolute top-4 right-16 p-2 text-gray-400 hover:text-red-600 transition-colors"
-              title="Delete component"
-            >
-              <Trash2 className="h-5 w-5" />
-            </button>
-          </div>
+          <PowerComponent
+            key={component.id}
+            component={component}
+            onToggle={toggleComponent}
+            onSetTimer={handleSetTimer}
+            onDelete={handleDelete}
+          />
         ))}
       </div>
 

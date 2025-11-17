@@ -16,7 +16,7 @@ export function usePowerData() {
     powerSimulation.startSimulation();
     const powerSub = powerSimulation.subscribe((data) => {
       setCurrentUsage(data.totalUsage);
-      setHistory(prev => [...prev.slice(-11), data]);
+      setHistory(prev => [...prev.slice(-29), data]); // Keep last 30 data points
     });
 
     return () => {
