@@ -21,4 +21,4 @@ The Digital Meter Dashboard is a web application built using the MERN stack to m
 - Quick Device Management: Simple process to add and manage devices with a well-structured form.
 
 
-## check website: https://resilient-cheesecake-1fb75d.netlify.app/
+## check website: https://amanchaurasia17.github.io/SmartMeter/
